@@ -332,13 +332,13 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-MODFLAGS	= -O2 -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfpu=vfp -DMODULE
+MODFLAGS	= -O2 -marm -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
 LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL	= -O2 -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfpu=vfp
-AFLAGS_KERNEL	= -O2 -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfpu=vfp
-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -O2 -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfpu=vfp
+CFLAGS_KERNEL	= -O2 -marm -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp
+AFLAGS_KERNEL	= -O2 -marm -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp
+CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -02 -marm -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp
 
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -353,7 +353,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks -O2 -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfpu=vfp
+		   -fno-delete-null-pointer-checks -O2 -marm -fomit-frame-pointer -pipe -ffast-math -mtune=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
@@ -546,6 +546,9 @@ ifndef CONFIG_CC_STACKPROTECTOR
 KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
 endif
 
+# This warning generated too much noise in a regular build.
+KBUILD_CFLAGS += $(call cc-disable-warning, -Wno-unused-but-set-variable)
+
 ifdef CONFIG_FRAME_POINTER
 KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
 else
@@ -574,7 +577,7 @@ CHECKFLAGS     += $(NOSTDINC_FLAGS)
 KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
 
 # disable pointer signed / unsigned warnings in gcc 4.0
-KBUILD_CFLAGS += $(call cc-option,-Wno-pointer-sign,)
+KBUILD_CFLAGS += $(call cc-disable-warning, pointer-sign)
 
 # disable invalid "can't wrap" optimizations for signed / pointers
 KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
