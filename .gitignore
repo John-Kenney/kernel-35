@@ -107,3 +107,5 @@ ncscope.*
 # compressed boot files
 arch/arm/boot/compressed/lib1funcs.S
 arch/arm/boot/compressed/piggy.gzip
+arch/arm/boot/compressed/piggy.xzkern
+
